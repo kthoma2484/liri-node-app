@@ -10,8 +10,6 @@ const input = process.argv.splice(3).join(' ');
 function searchOMDB() {
   let queryUrl = 'http://www.omdbapi.com/?t=' + input + '&y=&plot=short&apikey=trilogy';
 
-  console.log(input)
-
   request(queryUrl, function (error, response, body) {
     if (!error) {
 
@@ -24,11 +22,7 @@ function searchOMDB() {
         let plot = `\nPlot: ${JSON.parse(body).Plot}`;
         let actors = `\nActors: ${JSON.parse(body).Actors}`;
 
-      console.log(
-        title, year, imdb, rotten, country, lang, plot, actors
-        
-      )
-     
+      console.log(title, year, imdb, rotten, country, lang, plot, actors) 
     } else {
     console.log('error: ', error); // Print the error if one occurred
   }
@@ -36,17 +30,22 @@ function searchOMDB() {
 }
 
 function searchSpotify() {
-  var spotify = new Spotify(keys.spotify);
-  /*var spotify = new Spotify({
-    id: process.env.SPOTIFY_ID,
-    secret: process.env.SPOTIFY_SECRET
-  });*/
+
   console.log(input)
+  console.log('searching spotify only')
+  var spotify = new Spotify(keys.spotify);
 
   spotify
-    .search({type: 'track', query: input})
+  .search({type: 'track', query: input})
     .then(function (data) {
-      console.log(data);
+      let song = JSON.stringify(data.tracks.items[0]);
+          
+      /*let artist = `\nArtist: ${JSON.parse(song.artists.name)}`;
+      let songName = `\nSong Name: ${JSON.parse(song.name)}`;
+      let preview = `\nSong Preview: ${JSON.parse(song.album.artists.external_urls.spotify)}`;
+      let album = `\nAlbum: ${JSON.parse(song.album.name)}`;*/
+      
+      console.log(JSON.stringify(data.tracks.items[0]));
     })
     .catch(function (err) {
       console.error('Spotify error occurred: ' + err);
@@ -54,23 +53,19 @@ function searchSpotify() {
 }
 
 function searchTwitter() {
-  /*var client = new Twitter({
-    consumer_key: process.env.TWITTER_CONSUMER_KEY,
-    consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
-    access_token_key: process.env.TWITTER_ACCESS_TOKEN_KEY,
-    access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
-  });*/
+
   var client = new Twitter(keys.twitter);
 
   var params = {
     screen_name: 'nodejs'
   };
 
-  client.get('statuses/user_timeline', params, function (error, tweets, response) {
+  client.get('status', params, function (error, tweets, response) {
+    console.log("searching tweets only")
     if (!error) {
       console.log(tweets);
     } else {
-      console.log("tweet search didn't work. Error: " + error)
+      console.log("tweet search didn't work. Error: ")
     }
 
   });
