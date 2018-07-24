@@ -5,9 +5,13 @@ const Spotify = require('node-spotify-api');
 const Twitter = require('twitter');
 
 const search = process.argv[2];
-const input = process.argv.splice(3).join(' ');
+let input = process.argv.splice(3).join(' ');
 
 function searchOMDB() {
+  if (input == '') {
+    input = "Mr. Nobody";
+  }
+  
   let queryUrl = 'http://www.omdbapi.com/?t=' + input + '&y=&plot=short&apikey=trilogy';
 
   request(queryUrl, function (error, response, body) {
@@ -29,43 +33,69 @@ function searchOMDB() {
   });
 }
 
-function searchSpotify() {
+function searchSpotify(input) {
 
   console.log(input)
   console.log('searching spotify only')
   var spotify = new Spotify(keys.spotify);
-
+  
+  if (input == '') {
+    spotify
+    .search({type: 'track', query: 'the sign'})
+     
+      .then(function (data) {          
+        
+       // console.log(JSON.stringify(data.tracks.items[0].album.name));
+  
+        let artist = `\nArtist: ${JSON.stringify(data.tracks.items[5].artists[0].name)}`;
+        let songName = `\nSong Name: ${JSON.stringify(data.tracks.items[5].name)}`;
+        let preview = `\nSong Preview: ${JSON.stringify(data.tracks.items[5].album.artists[0].external_urls.spotify)}`;
+        let album = `\nAlbum: ${JSON.stringify(data.tracks.items[5].album.name)}`
+        
+        console.log(artist, songName, preview, album);
+      })
+      .catch(function (err) {
+        console.error('Spotify error occurred: ' + err);
+      });
+  } else {
   spotify
   .search({type: 'track', query: input})
-    .then(function (data) {
-      let song = JSON.stringify(data.tracks.items[0]);
-          
-      /*let artist = `\nArtist: ${JSON.parse(song.artists.name)}`;
-      let songName = `\nSong Name: ${JSON.parse(song.name)}`;
-      let preview = `\nSong Preview: ${JSON.parse(song.album.artists.external_urls.spotify)}`;
-      let album = `\nAlbum: ${JSON.parse(song.album.name)}`;*/
+   
+    .then(function (data) {          
       
-      console.log(JSON.stringify(data.tracks.items[0]));
+      //console.log(JSON.stringify(data.tracks.items[0]));
+
+      let artist = `\nArtist: ${JSON.stringify(data.tracks.items[0].artists[0].name)}`;
+      let songName = `\nSong Name: ${JSON.stringify(data.tracks.items[0].name)}`;
+      let preview = `\nSong Preview: ${JSON.stringify(data.tracks.items[0].album.artists[0].external_urls.spotify)}`;
+      let album = `\nAlbum: ${JSON.stringify(data.tracks.items[0].album.name)}`
+      
+      console.log(artist, songName, preview, album);
     })
     .catch(function (err) {
       console.error('Spotify error occurred: ' + err);
     });
+  }
 }
 
 function searchTwitter() {
 
   var client = new Twitter(keys.twitter);
 
-  var params = {
-    screen_name: 'nodejs'
-  };
-
-  client.get('status', params, function (error, tweets, response) {
+  client.get('search/tweets', {q: 'kthoma1984' , count: 21}, function (error, tweets, response) {
     console.log("searching tweets only")
     if (!error) {
-      console.log(tweets);
+      //console.log(tweets);
+      //console.log(response);
+
+      for (let i=0; i<21; i++) {
+      let tweetCreated = `\nCreated: ${tweets.statuses[i].created_at}`;
+      let myTweet = `\nTweet: ${tweets.statuses[i].text}`;
+
+      console.log(tweetCreated, myTweet);
+      }
     } else {
-      console.log("tweet search didn't work. Error: ")
+      console.log(JSON.stringify(error));
     }
 
   });
