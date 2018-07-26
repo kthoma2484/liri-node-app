@@ -13,6 +13,9 @@ function searchOMDB() {
     input = "Mr. Nobody";
   }
 
+  //console.log(input)
+  //console.log('searching omdb only')
+
   let queryUrl = 'http://www.omdbapi.com/?t=' + input + '&y=&plot=short&apikey=trilogy';
 
   request(queryUrl, function (error, response, body) {
@@ -36,8 +39,9 @@ function searchOMDB() {
 
 function searchSpotify(input) {
 
-  console.log(input)
-  console.log('searching spotify only')
+  //console.log(input)
+  //console.log('searching spotify only')
+
   var spotify = new Spotify(keys.spotify);
 
   if (input == '') {
@@ -57,6 +61,7 @@ function searchSpotify(input) {
         let album = `\nAlbum: ${JSON.stringify(data.tracks.items[5].album.name)}`
 
         console.log(artist, songName, preview, album);
+
       })
       .catch(function (err) {
         console.error('Spotify error occurred: ' + err);
@@ -88,7 +93,9 @@ function searchSpotify(input) {
 function searchTwitter() {
 
   var client = new Twitter(keys.twitter);
-
+  
+  //console.log('searching twitter only')
+  
   client.get('search/tweets', {
     q: 'kthoma1984',
     count: 21
@@ -112,6 +119,36 @@ function searchTwitter() {
 
 }
 
+function doWhatItSays () {
+  
+  fs.readFile("random.txt", "utf8", function(err, data) {
+    if (err) {
+      return console.log(err);
+    }
+    let result = data.split(',');
+
+    let input = result[1];
+
+    searchSpotify(input);
+  });
+
+};
+
+function logSearch() {
+    if (input === "") {
+      fs.appendFile("log.txt", `\n${search}`, function(err) {
+        if (err) {
+          return console.log(err);
+        };
+      });
+    } else {
+      fs.appendFile("log.txt", `\n${search}, '${input}'`, function(err) {
+        if (err) {
+          return console.log(err);
+        };
+      });
+    };
+}
 
 function searchCat(search, input) {
   switch (search) {
@@ -125,7 +162,7 @@ function searchCat(search, input) {
       searchOMDB(input);
       break;
     case 'do-what-it-says':
-      searchOMDB(input);
+      doWhatItSays(input);
       break;
     default:
       {
@@ -133,6 +170,7 @@ function searchCat(search, input) {
         break;
       }
   }
+  logSearch();
 }
 
 searchCat(search, input);
