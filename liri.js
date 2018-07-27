@@ -5,9 +5,11 @@ const request = require('request');
 const Spotify = require('node-spotify-api');
 const Twitter = require('twitter');
 
+// assign arguments
 const search = process.argv[2];
 let input = process.argv.splice(3).join(' ');
 
+// Runs search term and input on OMDB api
 function searchOMDB() {
   if (input == '') {
     input = "Mr. Nobody";
@@ -21,6 +23,7 @@ function searchOMDB() {
   request(queryUrl, function (error, response, body) {
     if (!error) {
 
+      // assign variables for each response field to displayed in console log
       let title = `\nTitle: ${JSON.parse(body).Title}`;
       let year = `\nYear Released: ${JSON.parse(body).Year}`;
       let imdb = `\nIMDB Rating: ${JSON.parse(body).imdbRating}`;
@@ -37,6 +40,7 @@ function searchOMDB() {
   });
 }
 
+// Runs search term and input on Spotify using request npm
 function searchSpotify(input) {
 
   //console.log(input)
@@ -90,6 +94,7 @@ function searchSpotify(input) {
   }
 }
 
+// Runs search for last 20 tweets using request
 function searchTwitter() {
 
   var client = new Twitter(keys.twitter);
@@ -119,8 +124,10 @@ function searchTwitter() {
 
 }
 
+// Runs search on what ever is in random text file
 function doWhatItSays () {
-  
+ 
+  // Gets text from random text file
   fs.readFile("random.txt", "utf8", function(err, data) {
     if (err) {
       return console.log(err);
@@ -129,11 +136,13 @@ function doWhatItSays () {
 
     let input = result[1];
 
+    //searches specifically for a spong using spotify search 
     searchSpotify(input);
   });
 
 };
 
+// adds each search to the log text file
 function logSearch() {
     if (input === "") {
       fs.appendFile("log.txt", `\n${search}`, function(err) {
@@ -150,6 +159,7 @@ function logSearch() {
     };
 }
 
+// depending on the search term used, this function will run a specific search 
 function searchCat(search, input) {
   switch (search) {
     case 'my-tweets':
